@@ -2,17 +2,13 @@ package com.dieva.items.mcsv.infrastructure.client.webclient;
 
 import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
+import com.dieva.items.mcsv.domain.model.Product;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +16,14 @@ public class ProductWebClientAdapter implements ItemService {
 
     private final WebClient.Builder webClient;
 
-    @Value("${url.product.mcsv}")
-    private String url;
-
     @Override
     public List<Item> getAllProducts() {
-        return this.webClient.build().get()
-                .uri("http://".concat(url))
+        return this.webClient.build()
+                .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToFlux(new ParameterizedTypeReference<Item>() {})
+                .bodyToFlux(Product.class)
+                .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .collectList()
                 .block();
     }
@@ -38,11 +32,11 @@ public class ProductWebClientAdapter implements ItemService {
     public Optional<Item> getProductById(Long id) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
-        return Optional.ofNullable(this.webClient.build().get()
-                .uri("http://".concat(url).concat("/{id}"), params)
+        return Optional.of(webClient.build().get().uri("/{id}", params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Item.class)
+                .bodyToMono(Product.class)
+                .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .block());
 
 
