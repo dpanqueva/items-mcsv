@@ -3,6 +3,7 @@ package com.dieva.items.mcsv.infrastructure.controller;
 import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
 import com.dieva.items.mcsv.domain.model.Product;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -48,13 +49,35 @@ public class ItemController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * This configuration apply for file application yml or properties
+     * */
+    @CircuitBreaker(name = "items", fallbackMethod = "buildFallBackItemOptional")
+    @GetMapping("/v2/{id}")
+    public ResponseEntity<Item> getItemByIdV2(@PathVariable Long id) {
+        Optional<Item> itemOptional = itemService.getProductById(id);
+        if(itemOptional.isPresent()) {
+            return ResponseEntity.ok(itemOptional.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     private Optional<Item> buildDefaultItemOptional(Throwable e){
         log.error(e.getMessage(), e);
-        return Optional.of(new Item(Product.builder()
+        return Optional.of(buildItemDefaultResponse());
+    }
+
+    private ResponseEntity<Item> buildFallBackItemOptional(Throwable e){
+        log.error(e.getMessage(), e);
+        return ResponseEntity.ok().body(buildItemDefaultResponse());
+    }
+
+    private Item buildItemDefaultResponse(){
+        return new Item(Product.builder()
                 .id(1L)
                 .name("Camara Sony")
                 .price(3000.0)
                 .createdAt(LocalDateTime.now().now())
-                .build(),5));
+                .build(),5);
     }
 }
