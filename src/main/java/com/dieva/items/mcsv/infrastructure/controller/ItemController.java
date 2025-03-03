@@ -4,6 +4,7 @@ import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
 import com.dieva.items.mcsv.domain.model.Product;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 //@RequestMapping("/api/v1/items")
@@ -62,6 +64,19 @@ public class ItemController {
         return ResponseEntity.notFound().build();
     }
 
+    @CircuitBreaker(name="items", fallbackMethod = "buildFallBackItemOptionalV3")
+    @TimeLimiter(name = "items")
+    @GetMapping("/v3/{id}")
+    public CompletableFuture<?> getItemByIdV3(@PathVariable Long id) {
+        return CompletableFuture.supplyAsync(()->{
+            Optional<Item> itemOptional = itemService.getProductById(id);
+            if(itemOptional.isPresent()) {
+                return ResponseEntity.ok(itemOptional.get());
+            }
+            return ResponseEntity.notFound().build();
+        });
+    }
+
     private Optional<Item> buildDefaultItemOptional(Throwable e){
         log.error(e.getMessage(), e);
         return Optional.of(buildItemDefaultResponse());
@@ -70,6 +85,11 @@ public class ItemController {
     private ResponseEntity<Item> buildFallBackItemOptional(Throwable e){
         log.error(e.getMessage(), e);
         return ResponseEntity.ok().body(buildItemDefaultResponse());
+    }
+
+    private CompletableFuture<?> buildFallBackItemOptionalV3(Throwable e){
+        log.error(e.getMessage(), e);
+        return CompletableFuture.completedFuture(ResponseEntity.ok().body(buildItemDefaultResponse()));
     }
 
     private Item buildItemDefaultResponse(){
