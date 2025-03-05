@@ -6,25 +6,37 @@ import com.dieva.items.mcsv.domain.model.Product;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+@RefreshScope
 @RestController
-//@RequestMapping("/api/v1/items")
 @Slf4j
 public class ItemController {
 
     private final ItemService itemService;
     private final CircuitBreakerFactory breakerFactory;
+
+    @Value("${config.text}")
+    private String configText;
+
+    @Autowired
+    private Environment env;
 
     public ItemController(@Qualifier("productWebClientAdapter") ItemService itemService, CircuitBreakerFactory breakerFactory) {
         this.itemService = itemService;
@@ -75,6 +87,19 @@ public class ItemController {
             }
             return ResponseEntity.notFound().build();
         });
+    }
+
+    @GetMapping("/fetch-config")
+    public ResponseEntity<Map<String,Object>>fetchConfig(@Value("${server.port}") int port){
+        Map<String,Object> json = new HashMap<String,Object>();
+        json.put("text", configText);
+        json.put("port", port);
+        if(env.getActiveProfiles().length > 0){
+            json.put("profile", env.getActiveProfiles()[0]);
+            json.put("name", env.getProperty("config.autor.name"));
+            json.put("email", env.getProperty("config.autor.email"));
+        }
+        return ResponseEntity.ok(json);
     }
 
     private Optional<Item> buildDefaultItemOptional(Throwable e){
