@@ -32,7 +32,7 @@ public class ProductWebClientAdapter implements ItemService {
     public Optional<Item> getProductById(Long id) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
-        return Optional.of(webClient.build().get().uri("/{id}", params)
+        return Optional.ofNullable(webClient.build().get().uri("/{id}", params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Product.class)
@@ -40,5 +40,41 @@ public class ProductWebClientAdapter implements ItemService {
                 .block());
 
 
+    }
+
+    @Override
+    public Optional<Item> saveItem(Product productItem) {
+
+        return Optional.ofNullable(webClient.build().post()
+                .bodyValue(productItem)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .map(product -> new Item(product, new Random().nextInt(10) + 1))
+                .block());
+    }
+
+    @Override
+    public Optional<Item> updateItem(Product productItem, Long id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        return Optional.ofNullable(webClient.build().put().uri("/{id}", params)
+                .bodyValue(productItem)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .map(product -> new Item(product, new Random().nextInt(10) + 1))
+                .block());
+    }
+
+    @Override
+    public void deleteItemById(Long id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        webClient.build().delete().uri("/{id}", params)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 }

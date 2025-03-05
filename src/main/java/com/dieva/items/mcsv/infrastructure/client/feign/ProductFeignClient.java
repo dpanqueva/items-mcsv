@@ -2,10 +2,7 @@ package com.dieva.items.mcsv.infrastructure.client.feign;
 
 import com.dieva.items.mcsv.domain.model.Product;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +17,12 @@ public interface ProductFeignClient {
 
     @PostMapping
     Product saveProduct(@RequestBody Product product);
+
+    @PutMapping("/{id}")
+    Product updateProduct(@RequestBody Product product, @PathVariable Long id);
+
+    @DeleteMapping("/{id}")
+    void deleteProductById(@PathVariable Long id);
 
 
 
