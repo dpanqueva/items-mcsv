@@ -1,6 +1,6 @@
 package com.dieva.items.mcsv.infrastructure.client.feign;
 
-import com.dieva.items.mcsv.domain.model.Product;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,16 +10,16 @@ import java.util.List;
 public interface ProductFeignClient {
 
     @GetMapping
-    List<Product> getProducts();
+    List<ProductDto> getProducts();
 
     @GetMapping("/{id}")
-    Product getProductById(@PathVariable Long id);
+    ProductDto getProductById(@PathVariable Long id);
 
     @PostMapping
-    Product saveProduct(@RequestBody Product product);
+    ProductDto saveProduct(@RequestBody ProductDto product);
 
     @PutMapping("/{id}")
-    Product updateProduct(@RequestBody Product product, @PathVariable Long id);
+    ProductDto updateProduct(@RequestBody ProductDto product, @PathVariable Long id);
 
     @DeleteMapping("/{id}")
     void deleteProductById(@PathVariable Long id);

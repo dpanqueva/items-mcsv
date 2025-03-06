@@ -1,5 +1,6 @@
 package com.dieva.items.mcsv.domain.model;
 
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import lombok.*;
 
 @Getter
@@ -9,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class Item {
 
-    private Product product;
+    private ProductDto product;
 
     private int quantity;
 

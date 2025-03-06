@@ -1,8 +1,8 @@
 package com.dieva.items.mcsv.infrastructure.client.feign;
 
 import com.dieva.items.mcsv.domain.model.Item;
-import com.dieva.items.mcsv.domain.model.Product;
 import com.dieva.items.mcsv.domain.port.out.ProductPort;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class ProductFeignAdapter implements ProductPort {
     }
 
     @Override
-    public Optional<Item> saveProduct(Product item) {
+    public Optional<Item> saveProduct(ProductDto item) {
         return Optional.of(Item.builder()
                 .product(productFeignClient.saveProduct(item))
                 .quantity(5)
@@ -39,7 +39,7 @@ public class ProductFeignAdapter implements ProductPort {
     }
 
     @Override
-    public Optional<Item> updateProduct(Product item, Long id) {
+    public Optional<Item> updateProduct(ProductDto item, Long id) {
         return Optional.of(Item.builder()
                 .product(productFeignClient.updateProduct(item, id))
                 .quantity(1)

@@ -2,8 +2,8 @@ package com.dieva.items.mcsv.application.usecases;
 
 import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
-import com.dieva.items.mcsv.domain.model.Product;
 import com.dieva.items.mcsv.domain.port.out.ProductPort;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +28,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Optional<Item> saveItem(Product productItem) {
+    public Optional<Item> saveItem(ProductDto productItem) {
         return productPort.saveProduct(productItem);
     }
 
     @Override
-    public Optional<Item> updateItem(Product productItem, Long id) {
+    public Optional<Item> updateItem(ProductDto productItem, Long id) {
         return productPort.updateProduct(productItem, id);
     }
 
