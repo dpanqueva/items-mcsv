@@ -13,9 +13,7 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -38,7 +36,7 @@ public class ItemController {
     @Autowired
     private Environment env;
 
-    public ItemController(@Qualifier("productWebClientAdapter") ItemService itemService, CircuitBreakerFactory breakerFactory) {
+    public ItemController(@Qualifier("itemServiceImpl") ItemService itemService, CircuitBreakerFactory breakerFactory) {
         this.itemService = itemService;
         this.breakerFactory = breakerFactory;
     }
@@ -87,6 +85,22 @@ public class ItemController {
             }
             return ResponseEntity.notFound().build();
         });
+    }
+
+    @PostMapping
+    public ResponseEntity<Item> saveItem(@RequestBody Product productItem) {
+        return ResponseEntity.ok(itemService.saveItem(productItem).get());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Item> updateItem(@RequestBody Product product, @PathVariable Long id) {
+        return ResponseEntity.ok(itemService.updateItem(product, id).get());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+        itemService.deleteItemById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/fetch-config")
