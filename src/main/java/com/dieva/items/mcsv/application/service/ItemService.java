@@ -1,7 +1,7 @@
 package com.dieva.items.mcsv.application.service;
 
 import com.dieva.items.mcsv.domain.model.Item;
-import com.dieva.items.mcsv.domain.model.Product;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,9 +12,9 @@ public interface ItemService {
 
     Optional<Item> getProductById(Long id);
 
-    Optional<Item> saveItem(Product productItem);
+    Optional<Item> saveItem(ProductDto productItem);
 
-    Optional<Item> updateItem(Product productItem, Long id);
+    Optional<Item> updateItem(ProductDto productItem, Long id);
 
     void deleteItemById(Long id);
 }

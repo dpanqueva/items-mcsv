@@ -2,7 +2,7 @@ package com.dieva.items.mcsv.infrastructure.controller;
 
 import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
-import com.dieva.items.mcsv.domain.model.Product;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
@@ -88,12 +88,12 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Item> saveItem(@RequestBody Product productItem) {
+    public ResponseEntity<Item> saveItem(@RequestBody ProductDto productItem) {
         return ResponseEntity.ok(itemService.saveItem(productItem).get());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Item> updateItem(@RequestBody Product product, @PathVariable Long id) {
+    public ResponseEntity<Item> updateItem(@RequestBody ProductDto product, @PathVariable Long id) {
         return ResponseEntity.ok(itemService.updateItem(product, id).get());
     }
 
@@ -132,7 +132,7 @@ public class ItemController {
     }
 
     private Item buildItemDefaultResponse(){
-        return new Item(Product.builder()
+        return new Item(ProductDto.builder()
                 .id(1L)
                 .name("Camara Sony")
                 .price(3000.0)

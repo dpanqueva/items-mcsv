@@ -2,7 +2,7 @@ package com.dieva.items.mcsv.infrastructure.client.webclient;
 
 import com.dieva.items.mcsv.application.service.ItemService;
 import com.dieva.items.mcsv.domain.model.Item;
-import com.dieva.items.mcsv.domain.model.Product;
+import com.dieva.libs.mcsv.commons.domain.model.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class ProductWebClientAdapter implements ItemService {
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToFlux(Product.class)
+                .bodyToFlux(ProductDto.class)
                 .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .collectList()
                 .block();
@@ -35,7 +35,7 @@ public class ProductWebClientAdapter implements ItemService {
         return Optional.ofNullable(webClient.build().get().uri("/{id}", params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Product.class)
+                .bodyToMono(ProductDto.class)
                 .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .block());
 
@@ -43,26 +43,26 @@ public class ProductWebClientAdapter implements ItemService {
     }
 
     @Override
-    public Optional<Item> saveItem(Product productItem) {
+    public Optional<Item> saveItem(ProductDto productItem) {
 
         return Optional.ofNullable(webClient.build().post()
                 .bodyValue(productItem)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Product.class)
+                .bodyToMono(ProductDto.class)
                 .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .block());
     }
 
     @Override
-    public Optional<Item> updateItem(Product productItem, Long id) {
+    public Optional<Item> updateItem(ProductDto productItem, Long id) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
         return Optional.ofNullable(webClient.build().put().uri("/{id}", params)
                 .bodyValue(productItem)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Product.class)
+                .bodyToMono(ProductDto.class)
                 .map(product -> new Item(product, new Random().nextInt(10) + 1))
                 .block());
     }
